@@ -11,7 +11,7 @@ import SwiftUI
 struct CountTo100App: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainMenuView()
         }
     }
 }

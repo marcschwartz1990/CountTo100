@@ -12,7 +12,44 @@ let backgroundImages = ["islandBackground", "schoolBackground", "rainbowBackgrou
                         "spaceBackground", "giraffeBackground", "vehicleBackground", "constructionBackground",
                         "bananaBackground", "donutBackground", "happyBackground"]
 
-struct ContentView: View {
+let dictLanguages = ["English": "en-US"]
+
+struct MainMenuView: View {
+    @State private var language = "en-US"
+    @State private var countBy = 1
+    var languageCodes = ["en-US", "es-MX", "it-IT", "fr-FR", "sv-SE", "ja-JP"]
+    var countByMultiples = [1, 2, 5, 10]
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Picker("Select a language", selection: $language) {
+                    ForEach(languageCodes, id: \.self) {
+                        Text("\($0)")
+                    }
+                }
+                .navigationTitle("Count to 100")
+                
+                Picker("Count by", selection: $countBy) {
+                    ForEach(countByMultiples, id: \.self) {
+                        Text("\($0)")
+                    }
+                }
+                    
+                NavigationLink(destination: GameView(languageCode: language, countBy: countBy)) {
+                    Text("Start Game")
+                }
+            }
+            
+        }
+    }
+}
+
+struct GameView: View {
+    // Variables passed in from MainMenuView
+    var languageCode: String
+    var countBy: Int
+    
     @State private var number = 0
     @State private var buttonFontSize = 100.0
     @State private var growGreenValue = 0.0
@@ -35,17 +72,17 @@ struct ContentView: View {
                     if number < 100 {
                     Button(String(number)) {
                         let utterance =
-                            AVSpeechUtterance(string: "\(String(number + 1))")
-                        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+                            AVSpeechUtterance(string: "\(String(number + countBy))")
+                        utterance.voice = AVSpeechSynthesisVoice(language: languageCode)
                         utterance.rate = 0.5
                         
                         let synthesizer = AVSpeechSynthesizer()
                         synthesizer.speak(utterance)
                         
-                        number += 1
-                        buttonFontSize += 1
-                        growGreenValue += 0.01
-                        fadeRedValue -= 0.01
+                        number += countBy
+                        buttonFontSize += Double(countBy)
+                        growGreenValue += Double(countBy) * 0.01
+                        fadeRedValue -= Double(countBy) * 0.01
                     }
                     .font(.system(size: buttonFontSize, weight: .bold))
                     .foregroundColor(Color(red: fadeRedValue, green: growGreenValue, blue: 0.3))
@@ -64,9 +101,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            ContentView()
-            ContentView()
-        }
+            MainMenuView()
     }
 }
